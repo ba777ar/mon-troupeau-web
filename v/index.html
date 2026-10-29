@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Mon troupeau · قطيعي · My Herd</title>
+<style>
+  :root {
+    --vert: #1B5E20; --vert-clair: #E8F3E6; --texte: #1C1F1A; --doux: #5B6357;
+    --fond: #F6F8F2; --carte: #FFFFFF; --ligne: #DDE3D8; --erreur: #B3261E;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --vert-clair: #1F3320; --texte: #E6E9E2; --doux: #A9B1A4; --fond: #121510; --carte: #1B1F19; --ligne: #2E352B; --erreur: #F2B8B5; }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--fond); color: var(--texte); font: 16px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans Arabic", sans-serif; }
+  header { background: var(--vert); color: #fff; padding: 14px 16px; display: flex; align-items: center; gap: 12px; }
+  header svg { width: 36px; height: 36px; flex: none; }
+  header .marque { font-weight: 600; }
+  header .sous { font-size: 13px; opacity: .85; }
+  main { max-width: 720px; margin: 0 auto; padding: 16px; }
+  .carte { background: var(--carte); border: 1px solid var(--ligne); border-radius: 16px; padding: 16px; margin-bottom: 16px; }
+  .photo { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: 12px; display: block; background: var(--vert-clair); }
+  h1 { font-size: 28px; margin: 12px 0 2px; letter-spacing: .5px; }
+  h2 { font-size: 18px; margin: 0 0 8px; }
+  .troupeau { color: var(--doux); margin: 0; }
+  dl { margin: 0; display: grid; grid-template-columns: minmax(110px, 40%) 1fr; }
+  dt, dd { margin: 0; padding: 8px 0; border-bottom: 1px solid var(--ligne); }
+  dt { color: var(--doux); }
+  dd { font-weight: 500; }
+  ol { list-style: none; margin: 0; padding: 0; }
+  li { padding: 10px 0; border-bottom: 1px solid var(--ligne); }
+  li:last-child, dl > :nth-last-child(-n+2) { border-bottom: 0; }
+  .date { font-size: 13px; color: var(--doux); }
+  .note { font-size: 14px; color: var(--doux); }
+  .pied { font-size: 13px; color: var(--doux); text-align: center; padding: 8px 0 24px; }
+  .message { text-align: center; padding: 48px 16px; }
+  .message strong { display: block; font-size: 20px; margin-bottom: 8px; }
+  .erreur { color: var(--erreur); }
+  .ltr { direction: ltr; unicode-bidi: isolate; }
+</style>
+</head>
+<body>
+<header>
+  <svg viewBox="0 0 432 432" aria-hidden="true"><circle cx="216" cy="216" r="216" fill="#2E7D32"/><g fill="#fff" transform="translate(216 236) scale(1.25) translate(-222 -236)"><rect x="178" y="250" width="14" height="62" rx="7"/><rect x="204" y="254" width="14" height="58" rx="7"/><rect x="252" y="254" width="14" height="58" rx="7"/><rect x="278" y="250" width="14" height="62" rx="7"/><circle cx="190" cy="212" r="40"/><circle cx="228" cy="194" r="42"/><circle cx="268" cy="204" r="40"/><circle cx="296" cy="228" r="32"/><circle cx="258" cy="242" r="36"/><circle cx="214" cy="244" r="36"/><circle cx="176" cy="236" r="30"/><g transform="rotate(-18 146 200)"><ellipse cx="146" cy="204" rx="27" ry="36"/><ellipse cx="122" cy="178" rx="17" ry="8"/></g></g></svg>
+  <div><div class="marque">Mon troupeau · قطيعي · My Herd</div><div class="sous" id="sous"></div></div>
+</header>
+<main id="contenu"><p class="message" id="chargement"></p></main>
+
+<script>
+(() => {
+  const PROJET = "mon-troupeau-2fdfe";
+  const T = {
+    fr: { sous: "Fiche partagée avec le vétérinaire", chargement: "Chargement de la fiche…",
+          historique: "Historique", aucun: "Aucun événement enregistré.", par: "par",
+          expire: "Lien valable jusqu'au", partage: "Partagé par", copie: "Copie en lecture seule, figée au moment du partage.",
+          invalide: "Lien expiré ou invalide", invalide2: "Demandez à l'éleveur de vous renvoyer un nouveau lien.",
+          reseau: "Connexion impossible", reseau2: "Vérifiez votre accès Internet puis rechargez la page." },
+    ar: { sous: "بطاقة مشتركة مع البيطري", chargement: "جارٍ تحميل البطاقة…",
+          historique: "السجل", aucun: "لا توجد أحداث مسجّلة.", par: "بواسطة",
+          expire: "الرابط صالح حتى", partage: "أرسلها", copie: "نسخة للقراءة فقط، كما كانت لحظة الإرسال.",
+          invalide: "الرابط منتهي أو غير صالح", invalide2: "اطلب من المربّي إرسال رابط جديد.",
+          reseau: "تعذّر الاتصال", reseau2: "تحقّق من الإنترنت ثم أعد تحميل الصفحة." },
+    en: { sous: "Record shared with the veterinarian", chargement: "Loading the record…",
+          historique: "History", aucun: "No event recorded.", par: "by",
+          expire: "Link valid until", partage: "Shared by", copie: "Read-only copy, frozen at the time of sharing.",
+          invalide: "Expired or invalid link", invalide2: "Ask the farmer to send you a new link.",
+          reseau: "Cannot connect", reseau2: "Check your Internet access, then reload the page." }
+  };
+  const langue = (navigator.language || "fr").slice(0, 2);
+  const t = T[langue] || T.fr;
+  if (langue === "ar") { document.documentElement.lang = "ar"; document.documentElement.dir = "rtl"; }
+  else if (langue === "en") { document.documentElement.lang = "en"; }
+  document.getElementById("sous").textContent = t.sous;
+  document.getElementById("chargement").textContent = t.chargement;
+
+  const contenu = document.getElementById("contenu");
+  const el = (balise, attrs = {}, ...enfants) => {
+    const n = document.createElement(balise);
+    for (const [k, v] of Object.entries(attrs)) n.setAttribute(k, v);
+    for (const e of enfants) if (e != null) n.append(e);
+    return n;
+  };
+  const message = (titre, texte) => {
+    contenu.replaceChildren(el("div", { class: "carte message" }, el("strong", { class: "erreur" }, titre), texte));
+  };
+
+  // Lecture du format REST de Firestore.
+  const valeur = (v) => {
+    if (!v) return null;
+    if ("stringValue" in v) return v.stringValue;
+    if ("timestampValue" in v) return new Date(v.timestampValue);
+    if ("integerValue" in v) return Number(v.integerValue);
+    if ("doubleValue" in v) return v.doubleValue;
+    if ("nullValue" in v) return null;
+    if ("arrayValue" in v) return (v.arrayValue.values || []).map(valeur);
+    if ("mapValue" in v) return objet(v.mapValue.fields || {});
+    return null;
+  };
+  const objet = (champs) => Object.fromEntries(Object.entries(champs).map(([k, v]) => [k, valeur(v)]));
+  const jj = (d) => String(d.getDate()).padStart(2, "0") + "/" + String(d.getMonth() + 1).padStart(2, "0") + "/" + d.getFullYear() +
+    " " + String(d.getHours()).padStart(2, "0") + ":" + String(d.getMinutes()).padStart(2, "0");
+
+  const jeton = (location.hash || "").replace(/^#/, "").trim();
+  if (!/^[a-f0-9]{40}$/.test(jeton)) { message(t.invalide, t.invalide2); return; }
+
+  fetch("https://firestore.googleapis.com/v1/projects/" + PROJET + "/databases/(default)/documents/partages/" + jeton)
+    .then((r) => {
+      if (r.status === 403 || r.status === 404) { message(t.invalide, t.invalide2); return null; }
+      if (!r.ok) throw new Error(r.status);
+      return r.json();
+    })
+    .then((doc) => {
+      if (!doc) return;
+      const p = objet(doc.fields || {});
+      document.title = (p.boucle || "") + " · Mon troupeau";
+
+      const carte = el("section", { class: "carte" });
+      if (p.photo) carte.append(el("img", { class: "photo", alt: p.boucle || "", src: "data:image/jpeg;base64," + p.photo }));
+      carte.append(el("h1", { class: "ltr" }, p.boucle || "—"), el("p", { class: "troupeau" }, p.nomTroupeau || ""));
+      const dl = el("dl");
+      for (const ligne of p.fiche || []) dl.append(el("dt", {}, ligne.l), el("dd", {}, ligne.v));
+      carte.append(dl);
+
+      const hist = el("section", { class: "carte" }, el("h2", {}, t.historique));
+      const liste = el("ol");
+      for (const e of p.historique || []) {
+        liste.append(el("li", {},
+          el("div", { class: "date" }, e.date + (e.auteur ? " · " + t.par + " " + e.auteur : "")),
+          el("div", {}, e.texte),
+          e.note ? el("div", { class: "note" }, e.note) : null));
+      }
+      if (!(p.historique || []).length) liste.append(el("li", { class: "note" }, t.aucun));
+      hist.append(liste);
+
+      const pied = el("p", { class: "pied" },
+        t.copie, el("br"),
+        (p.creeParNom ? t.partage + " " + p.creeParNom + " · " : "") + t.expire + " " + (p.expireLe ? jj(p.expireLe) : "—"));
+
+      contenu.replaceChildren(carte, hist, pied);
+    })
+    .catch(() => message(t.reseau, t.reseau2));
+})();
+</script>
+</body>
+</html>
